@@ -5,7 +5,7 @@ import "./Switch.css";
 export class Switch extends Component {
   render = () => (
     <label className="switch" onClick={this.props.onClick}>
-      <input type="checkbox" value={this.props.on} />
+      <input type="checkbox" checked={this.props.on} onChange={this.props.onClick} />
       <span className="slider round" />
     </label>
   );
