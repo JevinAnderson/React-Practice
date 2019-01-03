@@ -1,12 +1,24 @@
-import React, { Children, cloneElement, Component } from 'react';
+import React, { Children, cloneElement, Component, createContext } from 'react';
 import './App.css';
 import Switch from './Switch';
 
+const ToggleContext = React.createContext();
+
 class Toggle extends Component {
-  static On = ({ on, children }) => (on ? children : null);
-  static Off = ({ on, children }) => (on ? null : children);
-  static Button = ({ toggle, ...rest }) => (
-    <Switch onClick={toggle} {...rest} />
+  static On = ({ children }) => (
+    <ToggleContext.Consumer>
+      {({ on }) => (on ? children : null)}
+    </ToggleContext.Consumer>
+  );
+  static Off = ({ children }) => (
+    <ToggleContext.Consumer>
+      {({ on }) => (on ? null : children)}
+    </ToggleContext.Consumer>
+  );
+  static Button = () => (
+    <ToggleContext.Consumer>
+      {({ toggle, ...rest }) => <Switch onClick={toggle} {...rest} />}
+    </ToggleContext.Consumer>
   );
 
   state = { on: false };
@@ -24,13 +36,11 @@ class Toggle extends Component {
     );
   };
 
-  render = () =>
-    Children.map(this.props.children, childElement =>
-      cloneElement(childElement, {
-        on: this.state.on,
-        toggle: this.toggle
-      })
-    );
+  render = () => (
+    <ToggleContext.Provider value={{ on: this.state.on, toggle: this.toggle }}>
+      {this.props.children}
+    </ToggleContext.Provider>
+  );
 }
 
 function Usage({ onToggle = (...args) => console.log('onToggle', ...args) }) {
