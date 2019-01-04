@@ -1,8 +1,16 @@
-import React, { Children, cloneElement, Component, createContext } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
 import './App.css';
 import Switch from './Switch';
 
 const ToggleContext = React.createContext();
+
+const renderUI = ({ on, toggle, children }) => (
+  <ToggleContext.Provider value={{ on, toggle }}>
+    {children}
+  </ToggleContext.Provider>
+);
 
 class Toggle extends Component {
   static On = ({ children }) => (
@@ -21,8 +29,6 @@ class Toggle extends Component {
     </ToggleContext.Consumer>
   );
 
-  state = { on: false };
-
   toggle = event => {
     if (event) {
       event.preventDefault();
@@ -36,11 +42,13 @@ class Toggle extends Component {
     );
   };
 
-  render = () => (
-    <ToggleContext.Provider value={{ on: this.state.on, toggle: this.toggle }}>
-      {this.props.children}
-    </ToggleContext.Provider>
-  );
+  state = { on: false, toggle: this.toggle };
+
+  render = () => renderUI({ ...this.state, children: this.props.children });
+
+  static propTypes = {
+    renderUI: PropTypes.func
+  };
 }
 
 function Usage({ onToggle = (...args) => console.log('onToggle', ...args) }) {
